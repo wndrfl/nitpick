@@ -1,6 +1,7 @@
 import arg from 'arg';
 import inquirer from 'inquirer';
 
+const performance = require('./analyzers/performance');
 const seo = require('./analyzers/seo');
 
 const shelljs = require('shelljs');
@@ -38,10 +39,10 @@ async function promptForMissingOptions(options) {
           'name': 'SEO',
           'value': 'seo'
         },
-        // {
-        //   'name': 'Performance',
-        //   'value': 'performance'
-        // },
+        {
+          'name': 'Performance',
+          'value': 'performance'
+        },
         // {
         //   'name': 'Accessibility',
         //   'value': 'accessibility'
@@ -69,8 +70,8 @@ export async function cli(args) {
   options = await promptForMissingOptions(options);
 
   switch(options.fn) {
-    case 'seo':
-      const answer = await inquirer.prompt([
+    case 'performance':
+      const performanceAnswers = await inquirer.prompt([
         {
           type: 'input',
           name: 'url',
@@ -78,7 +79,18 @@ export async function cli(args) {
           default: 'https://wonderful.io/',
         }
       ]);
-      await seo.run(answer.url);
+      await performance.run(performanceAnswers.url);
+      break;
+    case 'seo':
+      const seoAnswers = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'url',
+          message: 'Which URL?',
+          default: 'https://wonderful.io/',
+        }
+      ]);
+      await seo.run(seoAnswers.url);
       break;
   }
 }

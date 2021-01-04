@@ -23,7 +23,7 @@ export function logResultsOfAnalysis(runnerResult, analysisTitle, lhrCategory) {
     output.bigSuccess('********** ' + analysisTitle + ' Passed! [SCORE: ' + score + ' / 100]');
 
   } else {
-    output.bigFailure('********** ' + analysisTitle + ' Failed.  [SCORE: ' + score + ' / 100] (Must be 90 - 100)');
+    output.bigFailure('********** ' + analysisTitle + ' Failed. [SCORE: ' + score + ' / 100] (Must be 90 - 100)');
 
     for(var key in runnerResult.lhr.audits) {
 
@@ -55,7 +55,7 @@ export async function runLighthouse(url,categories) {
   // fs.writeFileSync('lhreport.html', reportHtml);
 
   // `.lhr` is the Lighthouse Result as a JS object
-  console.log('Report is done for', runnerResult.lhr.finalUrl);
+  // console.log('Report is done for', runnerResult.lhr.finalUrl);
 
   await chrome.kill();
 
