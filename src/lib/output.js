@@ -10,26 +10,53 @@ function log(msg, indented) {
 	}
 }
 
-export function bigFailure(msg, indented) {
-	log(msg.bgRed.white, indented);
+export function bigFailure(title, msg, indented) {
+	let str = title + ' ' + (msg ? msg : '');
+	log(str.bgRed.white, indented);
 }
 
-export function bigSuccess(msg, indented) {
-	log(msg.bgBrightGreen.black, indented);
+export function bigInfo(title, msg, indented) {
+	let str = title + ' ' + (msg ? msg : '');
+	log(str.bgBrightBlue.black, indented);
 }
 
-export function error(msg, indented) {
-	log(msg.red, indented)
+export function bigSuccess(title, msg, indented) {
+	let str = title + ' ' + (msg ? msg : '');
+	log(str.bgBrightGreen.black, indented);
 }
 
-export function failure(msg, indented) {
-	log(msg.red, indented);
+export function error(title, msg, indented) {
+	let str = title.bold.red;
+	if(msg) {
+		str += ' ' + msg.red;
+	}
+	log(str, indented)
 }
 
-export function success(msg, indented) {
-	log(msg.green, indented);
+export function failure(title, msg, indented) {	
+	let str = title.bold.red;
+	if(msg) {
+		str += ' ' + msg.red;
+	}
+	log(str, indented);
 }
 
-export function info(msg, indented) {
-	log(msg.blue, indented);
+export function newline() {
+	console.log("\n");
+}
+
+export function success(title, msg, indented) {	
+	let str = title.bold.green;
+	if(msg) {
+		str += ' ' + msg.green;
+	}
+	log(str, indented);
+}
+
+export function info(title, msg, indented) {	
+	let str = title.bold.blue;
+	if(msg) {
+		str += ' ' + msg.blue;
+	}
+	log(str, indented);
 }

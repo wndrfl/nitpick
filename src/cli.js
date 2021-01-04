@@ -1,9 +1,7 @@
 import arg from 'arg';
 import inquirer from 'inquirer';
 
-const accessibility = require('./analyzers/accessibility');
-const performance = require('./analyzers/performance');
-const seo = require('./analyzers/seo');
+const lighthouse = require('./analyzers/lighthouse');
 
 const shelljs = require('shelljs');
 
@@ -36,6 +34,10 @@ async function promptForMissingOptions(options) {
       name: 'fn',
       message: 'What would you like to QA?',
       choices: [
+        {
+          'name': 'All',
+          'value': 'all'
+        },
         {
           'name': 'SEO',
           'value': 'seo'
@@ -84,7 +86,18 @@ export async function cli(args) {
           default: 'https://wonderful.io/',
         }
       ]);
-      await accessibility.run(accessibilityAnswers.url);
+      await lighthouse.accessibility(accessibilityAnswers.url);
+      break;
+    case 'all':
+      const allAnswers = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'url',
+          message: 'Which URL?',
+          default: 'https://wonderful.io/',
+        }
+      ]);
+      await lighthouse.all(allAnswers.url);
       break;
     case 'performance':
       const performanceAnswers = await inquirer.prompt([
@@ -95,7 +108,7 @@ export async function cli(args) {
           default: 'https://wonderful.io/',
         }
       ]);
-      await performance.run(performanceAnswers.url);
+      await lighthouse.performance(performanceAnswers.url);
       break;
     case 'seo':
       const seoAnswers = await inquirer.prompt([
@@ -106,7 +119,7 @@ export async function cli(args) {
           default: 'https://wonderful.io/',
         }
       ]);
-      await seo.run(seoAnswers.url);
+      await lighthouse.seo(seoAnswers.url);
       break;
   }
 }

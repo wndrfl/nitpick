@@ -16,31 +16,70 @@ export function analysisCategoryPasses(runnerResult, lhrCategory) {
   return scorePasses(score);
 }
 
-export function logResultsOfAnalysis(runnerResult, analysisTitle, lhrCategory) {
-  const score = normalizeScore(runnerResult.lhr.categories[lhrCategory].score);
+export function logResultsOfCategoryAnalysis(runnerResult, analysisTitle, lhrCategory) {
 
-  if(scorePasses(score)) {
-    output.bigSuccess('********** ' + analysisTitle + ' Passed! [SCORE: ' + score + ' / 100]');
+  if(!runnerResult.lhr.categories[lhrCategory]) {
+    return;
+  }
 
-  } else {
-    output.bigFailure('********** ' + analysisTitle + ' Failed. [SCORE: ' + score + ' / 100] (Must be 90 - 100)');
+  output.newline();
+  output.newline();
+  output.bigInfo(analysisTitle);
 
-    for(var key in runnerResult.lhr.audits) {
+  const auditRefs = runnerResult.lhr.categories[lhrCategory].auditRefs;
+  const auditRefIds = auditRefs.map((ref) => {
+    return ref.id;
+  });
+  output.info(auditRefIds.length + ' total audits...');
 
-      if(!runnerResult.lhr.audits.hasOwnProperty(key)) {
-        continue;
-      }
+  const passedAudits = [];
+  const failedAudits = [];
 
-      const audit = runnerResult.lhr.audits[key];
-      const score = normalizeScore(audit.score);
+  for(var key in runnerResult.lhr.audits) {
 
-      if(scorePasses(score)) {
-        output.success('✅ [' + score + '] ' + audit.title, true);
-      } else {
-        const msg = '🚨 [' + score + '] ' + audit.title + ': ' + audit.description;
-        output.failure(msg, true);
-      }
+    if(!auditRefIds.includes(key)) {
+      continue;
     }
+
+    if(!runnerResult.lhr.audits.hasOwnProperty(key)) {
+      continue;
+    }
+
+    const audit = runnerResult.lhr.audits[key];
+    const score = normalizeScore(audit.score);
+
+    if(scorePasses(score)) {
+      passedAudits.push({
+        title: '✅ [' + score + '] ' + audit.title + ':', 
+        msg: audit.description, 
+        indented: true
+      });
+    } else {
+      failedAudits.push({
+        title: '🚨 [' + score + '] ' + audit.title + ':', 
+        msg: audit.description, 
+        indented: true
+      });
+    }
+  }
+
+  output.newline();
+  output.info(failedAudits.length + ' failed audits...');
+  for(var i in failedAudits) {
+    output.failure(failedAudits[i].title, failedAudits[i].msg, failedAudits[i].indented);
+  }
+
+  output.newline();
+  output.info(passedAudits.length + ' passed audits...');
+  for(var i in passedAudits) {
+    output.success(passedAudits[i].title, passedAudits[i].msg, passedAudits[i].indented);
+  }
+
+  let score = normalizeScore(runnerResult.lhr.categories[lhrCategory].score);
+  if(scorePasses(score)) {
+    output.bigSuccess('Passed! [SCORE: ' + score + ' / 100]');
+  } else {
+    output.bigFailure('Failed. [SCORE: ' + score + ' / 100] (Must be 90 - 100)');
   }
 }
 
