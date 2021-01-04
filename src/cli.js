@@ -1,6 +1,7 @@
 import arg from 'arg';
 import inquirer from 'inquirer';
 
+const accessibility = require('./analyzers/accessibility');
 const performance = require('./analyzers/performance');
 const seo = require('./analyzers/seo');
 
@@ -43,6 +44,10 @@ async function promptForMissingOptions(options) {
           'name': 'Performance',
           'value': 'performance'
         },
+        {
+          'name': 'Accessibility',
+          'value': 'accessibility'
+        },
         // {
         //   'name': 'Accessibility',
         //   'value': 'accessibility'
@@ -70,6 +75,17 @@ export async function cli(args) {
   options = await promptForMissingOptions(options);
 
   switch(options.fn) {
+    case 'accessibility':
+      const accessibilityAnswers = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'url',
+          message: 'Which URL?',
+          default: 'https://wonderful.io/',
+        }
+      ]);
+      await accessibility.run(accessibilityAnswers.url);
+      break;
     case 'performance':
       const performanceAnswers = await inquirer.prompt([
         {
