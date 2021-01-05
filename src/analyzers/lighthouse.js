@@ -1,4 +1,5 @@
 const lighthouse = require('../lib/lighthouse');
+const output = require('../lib/output');
 
 const supportedCategories = [
 	{
@@ -39,17 +40,19 @@ export async function seo(url) {
 
 export async function run(lhrCategories, url) {
 
-  const runnerResult = await lighthouse.runLighthouse(url,lhrCategories.map((item) => {
-  	return item.key;
-  }));
+	output.bigInfo('Starting audits (' + (lhrCategories.map((item) => { return item.title }).join(', ')) + ') for URL: ' + url);
 
-  let passes = false;
-  for(var i in lhrCategories) {
+	const runnerResult = await lighthouse.runLighthouse(url,lhrCategories.map((item) => {
+		return item.key;
+	}));
+
+	let passes = false;
+	for(var i in lhrCategories) {
 		lighthouse.logResultsOfCategoryAnalysis(runnerResult, lhrCategories[i].title, lhrCategories[i].key);
 		if(lighthouse.analysisCategoryPasses(runnerResult, lhrCategories[i].key)) {
 			passes = true;
 		}
-  }
+	}
 
-  return passes;
+	return passes;
 }

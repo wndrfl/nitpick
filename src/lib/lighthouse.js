@@ -24,7 +24,7 @@ export function logResultsOfCategoryAnalysis(runnerResult, analysisTitle, lhrCat
 
   output.newline();
   output.newline();
-  output.bigInfo(analysisTitle);
+  output.bigInfo(analysisTitle + ' Audit');
 
   const auditRefs = runnerResult.lhr.categories[lhrCategory].auditRefs;
   const auditRefIds = auditRefs.map((ref) => {
@@ -75,12 +75,14 @@ export function logResultsOfCategoryAnalysis(runnerResult, analysisTitle, lhrCat
     output.success(passedAudits[i].title, passedAudits[i].msg, passedAudits[i].indented);
   }
 
+  output.newline();
   let score = normalizeScore(runnerResult.lhr.categories[lhrCategory].score);
   if(scorePasses(score)) {
-    output.bigSuccess('Passed! [SCORE: ' + score + ' / 100]');
+    output.bigSuccess(analysisTitle + ' Audit Passed! [SCORE: ' + score + ' / 100]');
   } else {
-    output.bigFailure('Failed. [SCORE: ' + score + ' / 100] (Must be 90 - 100)');
+    output.bigFailure(analysisTitle + ' Failed. [SCORE: ' + score + ' / 100] (Must be 90 - 100)');
   }
+  output.newline();
 }
 
 export async function runLighthouse(url,categories) {

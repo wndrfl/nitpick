@@ -5,13 +5,13 @@ const lighthouse = require('./analyzers/lighthouse');
 
 const shelljs = require('shelljs');
 
-const defaultFn = 'seo';
+const defaultFn = 'all';
 
 function parseArgumentsIntoOptions(rawArgs) {
 
   const args = arg(
     {
-      '--clean-slate': Boolean,
+      // '--clean-slate': Boolean,
     },
     {
       argv: rawArgs.slice(2),
@@ -21,8 +21,7 @@ function parseArgumentsIntoOptions(rawArgs) {
   return {
     cleanSlate: args['--clean-slate'] || false,
     fn: args._[0],
-    server: args['--clean-slate'] || false,
-    // runInstall: args['--install'] || false,
+    url: args._[1]
   };
 }
 
@@ -50,14 +49,6 @@ async function promptForMissingOptions(options) {
           'name': 'Accessibility',
           'value': 'accessibility'
         },
-        // {
-        //   'name': 'Accessibility',
-        //   'value': 'accessibility'
-        // },
-        // {
-        //   'name': 'WordPress Theme Code',
-        //   'value': 'wordpress_theme_code'
-        // }
       ],
       default: defaultFn,
     }
@@ -74,52 +65,40 @@ export async function cli(args) {
 	
   let options = parseArgumentsIntoOptions(args);
 
-  options = await promptForMissingOptions(options);
+  if(!options.fn) {
+    options = await promptForMissingOptions(options);
+  }
+
+  if(!options.url) {
+    let answers = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'url',
+        message: 'Which URL?',
+        default: 'https://wonderful.io/',
+      }
+    ]);
+
+    options.url = answers.url;
+  }
 
   switch(options.fn) {
+
     case 'accessibility':
-      const accessibilityAnswers = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'url',
-          message: 'Which URL?',
-          default: 'https://wonderful.io/',
-        }
-      ]);
-      await lighthouse.accessibility(accessibilityAnswers.url);
+      await lighthouse.accessibility(options.url);
       break;
+
     case 'all':
-      const allAnswers = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'url',
-          message: 'Which URL?',
-          default: 'https://wonderful.io/',
-        }
-      ]);
-      await lighthouse.all(allAnswers.url);
+      await lighthouse.all(options.url);
       break;
+
     case 'performance':
-      const performanceAnswers = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'url',
-          message: 'Which URL?',
-          default: 'https://wonderful.io/',
-        }
-      ]);
-      await lighthouse.performance(performanceAnswers.url);
+      await lighthouse.performance(options.url);
       break;
+
     case 'seo':
-      const seoAnswers = await inquirer.prompt([
-        {
-          type: 'input',
-          name: 'url',
-          message: 'Which URL?',
-          default: 'https://wonderful.io/',
-        }
-      ]);
-      await lighthouse.seo(seoAnswers.url);
+      await lighthouse.seo(options.url);
       break;
+
   }
 }
