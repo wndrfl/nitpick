@@ -3,11 +3,11 @@ const lighthouse = require('lighthouse');
 const output = require('../lib/output');
 const chromeLauncher = require('chrome-launcher');
 
-function scorePasses(score) {
+export function scorePasses(score) {
   return (score >= 90);
 }
 
-function normalizeScore(score) {
+export function normalizeScore(score) {
   return score * 100;
 }
 
@@ -16,22 +16,18 @@ export function analysisCategoryPasses(runnerResult, lhrCategory) {
   return scorePasses(score);
 }
 
-export function logResultsOfCategoryAnalysis(runnerResult, analysisTitle, lhrCategory) {
+export function parseResultsOfCategoryAnalysis(runnerResult, lhrCategory) {
 
   if(!runnerResult.lhr.categories[lhrCategory]) {
     return;
   }
 
-  output.newline();
-  output.newline();
-  output.bigInfo(analysisTitle + ' Audit');
-
   const auditRefs = runnerResult.lhr.categories[lhrCategory].auditRefs;
   const auditRefIds = auditRefs.map((ref) => {
     return ref.id;
   });
-  output.info(auditRefIds.length + ' total audits...');
 
+  const notApplicableAudits = [];
   const passedAudits = [];
   const failedAudits = [];
 
@@ -46,43 +42,45 @@ export function logResultsOfCategoryAnalysis(runnerResult, analysisTitle, lhrCat
     }
 
     const audit = runnerResult.lhr.audits[key];
-    const score = normalizeScore(audit.score);
 
-    if(scorePasses(score)) {
-      passedAudits.push({
-        title: '✅ [' + score + '] ' + audit.title + ':', 
-        msg: audit.description, 
-        indented: true
-      });
-    } else {
-      failedAudits.push({
-        title: '🚨 [' + score + '] ' + audit.title + ':', 
-        msg: audit.description, 
-        indented: true
-      });
+    // Weed out various audits that don't impact the report
+    if(audit.score == null && audit.scoreDisplayMode != 'notApplicable') {
+      continue;
+    }
+
+    const score = normalizeScore(audit.score);      
+
+    var auditRepresentation = {
+      title: audit.title, 
+      description: audit.description,
+      score: score,
+      details: audit.details,
+    };
+
+    // Some items are "not applicable" and don't count against
+    // the score
+    if(audit.scoreDisplayMode == 'notApplicable') {
+
+      notApplicableAudits.push(auditRepresentation);
+
+    }else{
+
+      // If the score is above a certain threshold, it "passes"
+      if(scorePasses(score)) {
+        passedAudits.push(auditRepresentation);
+
+      // If the score is below threashold
+      } else {
+        failedAudits.push(auditRepresentation);
+      }
     }
   }
 
-  output.newline();
-  output.info(failedAudits.length + ' failed audits...');
-  for(var i in failedAudits) {
-    output.failure(failedAudits[i].title, failedAudits[i].msg, failedAudits[i].indented);
+  return {
+    failed: failedAudits,
+    notApplicable: notApplicableAudits,
+    passed: passedAudits
   }
-
-  output.newline();
-  output.info(passedAudits.length + ' passed audits...');
-  for(var i in passedAudits) {
-    output.success(passedAudits[i].title, passedAudits[i].msg, passedAudits[i].indented);
-  }
-
-  output.newline();
-  let score = normalizeScore(runnerResult.lhr.categories[lhrCategory].score);
-  if(scorePasses(score)) {
-    output.bigSuccess(analysisTitle + ' Audit Passed! [SCORE: ' + score + ' / 100]');
-  } else {
-    output.bigFailure(analysisTitle + ' Failed. [SCORE: ' + score + ' / 100] (Must be 90 - 100)');
-  }
-  output.newline();
 }
 
 export async function runLighthouse(url,categories) {
@@ -90,13 +88,6 @@ export async function runLighthouse(url,categories) {
   const chrome = await chromeLauncher.launch({chromeFlags: ['--headless']});
   const options = {logLevel: 'info', output: 'html', onlyCategories: categories, port: chrome.port};
   const runnerResult = await lighthouse(url, options);
-
-  // `.report` is the HTML report as a string
-  // const reportHtml = runnerResult.report;
-  // fs.writeFileSync('lhreport.html', reportHtml);
-
-  // `.lhr` is the Lighthouse Result as a JS object
-  // console.log('Report is done for', runnerResult.lhr.finalUrl);
 
   await chrome.kill();
 

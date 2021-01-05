@@ -41,6 +41,14 @@ export function failure(title, msg, indented) {
 	log(str, indented);
 }
 
+export function info(title, msg, indented) {	
+	let str = title.bold.blue;
+	if(msg) {
+		str += ' ' + msg.blue;
+	}
+	log(str, indented);
+}
+
 export function newline() {
 	console.log("\n");
 }
@@ -53,10 +61,10 @@ export function success(title, msg, indented) {
 	log(str, indented);
 }
 
-export function info(title, msg, indented) {	
-	let str = title.bold.blue;
+export function warning(title, msg, indented) {	
+	let str = title.bold.yellow;
 	if(msg) {
-		str += ' ' + msg.blue;
+		str += ' ' + msg.yellow;
 	}
 	log(str, indented);
 }
