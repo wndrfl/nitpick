@@ -22,6 +22,13 @@ $ nitpick
   Accessibility
 ```
 
+## Usage
+Typically, it will be best to run Nitpick with various arguments passed in (to avoid the wizard):
+
+```
+$ nitpick https://wonderful.io/ seo -o -v
+```
+
 ## Commands
 The Wonderpress provides different commands for many common tasks.
 
