@@ -1,10 +1,10 @@
 {
-  "name": "@wndrfl/wonderful-qa",
+  "name": "@wndrfl/nitpick",
   "version": "1.0.0",
   "description": "A commandline interface aiding in the quality assurance of front end websites.",
   "main": "index.js",
   "bin": {
-    "qa": "./bin/wonderpress.js"
+    "nitpick": "./bin/nitpick.js"
   },
   "publishConfig": {
     "access": "public"
