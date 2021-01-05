@@ -20,8 +20,8 @@ function parseArgumentsIntoOptions(rawArgs) {
 
   return {
     cleanSlate: args['--clean-slate'] || false,
-    fn: args._[0],
-    url: args._[1]
+    url: args._[0],
+    fn: args._[1]
   };
 }
 
@@ -63,23 +63,24 @@ async function promptForMissingOptions(options) {
 
 export async function cli(args) {
 	
-  let options = parseArgumentsIntoOptions(args);
-
-  if(!options.fn) {
-    options = await promptForMissingOptions(options);
-  }
+  let options = parseArgumentsIntoOptions(args);  
 
   if(!options.url) {
     let answers = await inquirer.prompt([
       {
         type: 'input',
         name: 'url',
-        message: 'Which URL?',
+        message: 'What URL would you like to fuss about?',
         default: 'https://wonderful.io/',
       }
     ]);
 
     options.url = answers.url;
+  }
+
+
+  if(!options.fn) {
+    options = await promptForMissingOptions(options);
   }
 
   switch(options.fn) {
