@@ -11,7 +11,11 @@ function parseArgumentsIntoOptions(rawArgs) {
 
   const args = arg(
     {
-      // '--clean-slate': Boolean,
+      '--open'    : Boolean,
+      '--verbose' : Boolean,
+
+      '-o'        : '--open',
+      '-v'        : '--verbose',
     },
     {
       argv: rawArgs.slice(2),
@@ -19,7 +23,8 @@ function parseArgumentsIntoOptions(rawArgs) {
   );
 
   return {
-    cleanSlate: args['--clean-slate'] || false,
+    openResultsInBrowser: args['--open'] || false,
+    verbose: args['--verbose'] || false,
     url: args._[0],
     fn: args._[1]
   };
@@ -86,19 +91,22 @@ export async function cli(args) {
   switch(options.fn) {
 
     case 'accessibility':
-      await lighthouse.accessibility(options.url);
+      options.lhrCategories = lighthouse.supportedCategories.accessibility;
+      return await lighthouse.run(options);
       break;
 
     case 'all':
-      await lighthouse.all(options.url);
+      return await lighthouse.run(options);
       break;
 
     case 'performance':
-      await lighthouse.performance(options.url);
+      options.lhrCategories = lighthouse.supportedCategories.performance;
+      return await lighthouse.run(options);
       break;
 
     case 'seo':
-      await lighthouse.seo(options.url);
+      options.lhrCategories = [lighthouse.supportedCategories.seo];
+      return await lighthouse.run(options);
       break;
 
   }
