@@ -27,6 +27,15 @@ The Wonderpress provides different commands for many common tasks.
 
 - `nitpick <url> <all|accessibility|seo|performance>` - Runs a Google Lighthouse audit on a provided public url, with the chosen audit category.
 
+## Options
+```
+--open		# Open Lighthouse report in browser
+--verbose	# Output extra logs and opportunities for improvement
+
+-o 			# Alias for --open
+-v 			# Alias for --verbose
+```
+
 ## License
 MIT
 
