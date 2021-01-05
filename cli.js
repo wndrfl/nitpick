@@ -1,7 +1,7 @@
 import arg from 'arg';
 import inquirer from 'inquirer';
 
-const lighthouse = require('./analyzers/lighthouse');
+const nitpick = require('./index');
 
 const shelljs = require('shelljs');
 
@@ -91,22 +91,22 @@ export async function cli(args) {
   switch(options.fn) {
 
     case 'accessibility':
-      options.lhrCategories = lighthouse.supportedCategories.accessibility;
-      return await lighthouse.run(options);
+      options.lhrCategories = nitpick.supportedCategories.accessibility;
+      return await nitpick.run(options);
       break;
 
     case 'all':
-      return await lighthouse.run(options);
+      return await nitpick.run(options);
       break;
 
     case 'performance':
-      options.lhrCategories = lighthouse.supportedCategories.performance;
-      return await lighthouse.run(options);
+      options.lhrCategories = nitpick.supportedCategories.performance;
+      return await nitpick.run(options);
       break;
 
     case 'seo':
-      options.lhrCategories = [lighthouse.supportedCategories.seo];
-      return await lighthouse.run(options);
+      options.lhrCategories = [nitpick.supportedCategories.seo];
+      return await nitpick.run(options);
       break;
 
   }
