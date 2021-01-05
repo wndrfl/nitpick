@@ -68,6 +68,9 @@ export async function run(options) {
 	for(var i in options.lhrCategories) {
 		
 		let results = lighthouse.parseResultsOfCategoryAnalysis(runnerResult, options.lhrCategories[i].key);
+		if(!results) {
+			continue;
+		}
 		
 		if(lighthouse.analysisCategoryPasses(runnerResult, options.lhrCategories[i].key)) {
 			passes = true;
