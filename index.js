@@ -1,5 +1,6 @@
 const fs = require('fs');
 const lighthouse = require('./src/lib/lighthouse');
+const metadata = require('./src/lib/metadata');
 const open = require('open');
 const output = require('./src/lib/output');
 
@@ -46,6 +47,20 @@ export async function category(category, options) {
 
 export async function run(options) {
 
+	const url = options.url;
+
+	output.bigInfo('Nitpicking: ' + url);
+
+	// Get metadata
+	output.info('Grabbing metadata...');
+	let metadataForUrl = await metadata.get(url);
+	for(var m in metadataForUrl) {
+		output.info(m + ': ', (metadataForUrl[m] ? metadataForUrl[m] : '-'), true);
+	}
+
+
+	// Lighthouse operations
+	output.newline();
 	if(options.lhrCategories != null && !Array.isArray(options.lhrCategories)) {
 		options.lhrCategories = [options.lhrCategories];
 	}
@@ -56,9 +71,9 @@ export async function run(options) {
 		options.lhrCategories = Object.values(supportedCategories);
 	}
 
-	output.bigInfo('Starting audits (' + (options.lhrCategories.map((item) => { return item.title }).join(', ')) + ') for URL: ' + options.url);
+	output.info('Starting Lighthouse audits (' + (options.lhrCategories.map((item) => { return item.title }).join(', ')) + ')...');
 
-	const runnerResult = await lighthouse.runLighthouse(options.url,options.lhrCategories.map((item) => {
+	const runnerResult = await lighthouse.runLighthouse(url,options.lhrCategories.map((item) => {
 		return item.key;
 	}));
 
