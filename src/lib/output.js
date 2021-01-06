@@ -44,7 +44,7 @@ export function failure(title, msg, indented) {
 export function info(title, msg, indented) {	
 	let str = title.bold.blue;
 	if(msg) {
-		str += ' ' + msg.blue;
+		str += ' ' + msg.white;
 	}
 	log(str, indented);
 }
