@@ -1,6 +1,6 @@
 {
   "name": "@wndrfl/nitpick",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "A commandline interface aiding in the quality assurance of front end websites.",
   "main": "index.js",
   "bin": {
