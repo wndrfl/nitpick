@@ -90,7 +90,6 @@ export async function runLighthouse(url,categories) {
   const chrome = await chromeLauncher.launch({chromeFlags: ['--headless']});
   const options = {logLevel: 'info', output: 'html', onlyCategories: categories, port: chrome.port};
   const runnerResult = await lighthouse(url, options);
-  console.log(runnerResult.lhr);
 
   await chrome.kill();
 
