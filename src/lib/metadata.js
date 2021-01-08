@@ -9,6 +9,7 @@ export async function get(url) {
         let $ = cheerio.load(response.data);
 
         let post = {
+            title: $('title').text(),
             h1: $('h1').text(),
             canonical: $('link[rel="canonical"]').attr('href'),
             description: $('meta[name="description"]').attr('content'),

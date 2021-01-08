@@ -1,6 +1,7 @@
 const fs = require('fs');
 const lighthouse = require('./src/lib/lighthouse');
 const metadata = require('./src/lib/metadata');
+const mustache = require('mustache');
 const open = require('open');
 const output = require('./src/lib/output');
 
@@ -107,16 +108,6 @@ export async function run(options) {
 		categoryResults[options.lhrCategories[i].title] = results;
 	}
 
-	// Open the report in the browser?
-	if(options.openResultsInBrowser) {
-		output.info('Opening report in browser...');
-		const reportHtml = runnerResult.report;
-		const filename = 'lhreport.html';
-		fs.writeFileSync(filename, reportHtml);
-		await open(filename);
-		// await fs.unlinkSync(filename);
-	}
-
 	if(options.verbose) {
 		for(var i in categoryResults) {
 			let failed = categoryResults[i].failed;
@@ -128,6 +119,53 @@ export async function run(options) {
 				output.newline();
 			}
 		}
+	}
+
+	// Generate report
+
+	const filename = 'report.html';
+
+	let path = require.resolve('./report.template.html');
+	let data = fs.readFileSync(path, 'utf8');
+
+	let params = {};
+
+	// General Meta
+	params.canonical = metadataForUrl.canonical;
+	params.meta_description = metadataForUrl.meta_description;
+	params.fb_app_id = metadataForUrl.fb_app_id;
+	params.fb_pages = metadataForUrl.fb_pages;
+	params.og_image = metadataForUrl.og_image;
+	params.og_title = metadataForUrl.og_title;
+	params.og_type = metadataForUrl.og_type;
+	params.og_url = metadataForUrl.og_url;
+	params.page_title = metadataForUrl.title;
+	params.url = url;
+
+	// Improvement Opportunities
+	let improvementOpportunities = [];
+	for(var i in categoryResults) {
+		let failed = categoryResults[i].failed;
+		for(var f in failed) {
+			var item = failed[f];
+			improvementOpportunities.push({
+				title : item.title,
+				description :  item.description
+			});
+		}
+	}
+	params.total_improvement_opportunities = improvementOpportunities.length;
+	params.improvement_opportunities = improvementOpportunities;
+
+
+	var content = mustache.render(data, params);
+	fs.writeFileSync(filename, content);
+
+	// Open the report in the browser?
+	if(options.openResultsInBrowser) {
+		output.info('Opening report in browser...');
+		await open(filename);
+		// await fs.unlinkSync(filename);
 	}
 
 	return passes;

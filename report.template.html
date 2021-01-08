@@ -1,0 +1,118 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Nitpick Report: {{{ page_title }}}</title>
+  <meta name="description" content="The HTML5 Herald">
+  <meta name="author" content="SitePoint">
+
+</head>
+
+<body>
+
+	<header>
+		<h1>
+			Nitpick Report: {{{ page_title }}}
+		</h1>
+		<p>
+			<a href="{{{ url }}}" target="_blank">
+				{{{ url }}}
+			</a>
+		</p>
+	</header>
+
+	<section>
+		<table>
+			<tbody>
+				<tr>
+					<th>
+						Description
+					</th>
+					<td>
+						{{{ meta_description }}}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						Canonical
+					</th>
+					<td>
+						{{{ canonical }}}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						og:title
+					</th>
+					<td>
+						{{{ og_title }}}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						og:url
+					</th>
+					<td>
+						{{{ og_url }}}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						og:image
+					</th>
+					<td>
+						{{{ og_image }}}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						og:type
+					</th>
+					<td>
+						{{{ og_type }}}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						fb:app_id
+					</th>
+					<td>
+						{{{ fb_app_id }}}
+					</td>
+				</tr>
+				<tr>
+					<th>
+						fb:pages
+					</th>
+					<td>
+						{{{ fb_pages }}}
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</section>
+
+	<section>
+		<h2>
+			{{ total_improvement_opportunities }} Improvement Opportunities
+		</h2>
+
+		<ul>
+			{{#improvement_opportunities}}
+			<li>
+				<h4>
+					{{{ title }}}
+				</h4>
+				<p>
+					{{{ description }}}
+				</p>
+			</li>
+			{{/improvement_opportunities}}
+		</ul>
+
+	</section>
+
+</body>
+</html>
