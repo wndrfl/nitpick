@@ -1,0 +1,82 @@
+@mixin border-radius($radius) {
+-webkit-border-radius: $radius;
+	-moz-border-radius: $radius;
+	-ms-border-radius: $radius;
+	-o-border-radius: $radius;
+		border-radius: $radius;
+}
+
+@mixin clearfix {
+	zoom:1;
+	&:before, &:after {
+		content: "\0020";
+		display: block;
+		height: 0;
+		overflow: hidden;
+	}
+	&:after {
+		clear: both;
+	}
+}
+
+@function em($target, $context: 16) {
+	@return ($target / $context)*1em;
+}
+
+@mixin box-shadow($params) {
+	-webkit-box-shadow:$params;
+	-moz-box-shadow:$params;
+	box-shadow:$params;
+}
+
+@mixin breakpoint($point) {
+	@if $point == large-desktop-screen {
+		@media (min-width: 1200px) { @content; }
+	}
+	@else if $point == desktop-screen {
+		@media (min-width: 992px)  { @content; }
+	}
+	@else if $point == tablet-screen {
+		@media (min-width: 768px)  { @content; }
+	}
+	@else if $point == large-phone-screen {
+		@media (min-width: 576px)  { @content; }
+	}
+	@else if $point == only-phone-screen {
+		@media (max-width: 767px)  { @content; }
+	}
+}
+
+@mixin inset-shadow($type) {
+	@if $type == b {
+		@include box-shadow(inset 0px -5px 0px 0px rgba(0, 0, 0, 0.1));
+	}
+	@else if $type == l {
+		@include box-shadow(inset 5px 0px 0px 0px rgba(0, 0, 0, 0.1));
+	}
+	@else if $type == r {
+		@include box-shadow(inset -5px 0px 0px 0px rgba(0, 0, 0, 0.1));
+	}
+	@else if $type == rb {
+		@include box-shadow(inset -5px -5px 0px 0px rgba(0, 0, 0, 0.1));
+	}
+	@else if $type == t {
+		@include box-shadow(inset 0px 5px 0px 0px rgba(0, 0, 0, 0.1));
+	}
+}
+
+@mixin transform($transform) {
+	-webkit-transform: $transform;
+	-moz-transform: $transform;
+	-ms-transform: $transform;
+	-o-transform: $transform;
+	transform: $transform;
+}
+
+@mixin transition($transition-property, $transition-time, $method) {
+	-webkit-transition: $transition-property $transition-time $method;
+	-moz-transition: $transition-property $transition-time $method;
+	-ms-transition: $transition-property $transition-time $method;
+	-o-transition: $transition-property $transition-time $method;
+	transition: $transition-property $transition-time $method;
+}

@@ -1,0 +1,270 @@
+*,
+a,
+a:hover {
+	color:$black;
+	font-family:$sans-serif;
+	-webkit-font-smoothing: antialiased;
+}
+
+a {
+	text-decoration:underline;
+
+	&.no-underline {
+		text-decoration:none;
+	}
+}
+
+body {
+	background-color:$white;
+
+	&.no-scroll {
+		overflow: hidden;
+	}
+}
+
+strong {
+	font-weight:bold;
+}
+
+.gauge-container {
+	position: relative;
+
+	.gauge {
+
+		position: relative;
+		display: block;
+    
+	    circle{ 
+	    	stroke-width: 15; 
+	    }
+
+		.rail { 
+			fill: transparent; 
+		}
+
+		.progress{
+
+			fill: transparent;
+			stroke-linecap: round;
+
+		}
+
+	}
+
+	.center {
+
+		display: inline-block;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+		font-weight: 300;
+
+	    &.percentage { 
+	    	font-size: 2vw; 
+	    }
+
+	    &.icon { 
+	    	font-size: 3vw; 
+	    }
+
+		.percentSymbol { 
+			font-size: .8em; 
+		}
+			
+		.value { 
+			font-size: 1.8em; 
+		}
+
+		.small {
+			font-size:14px;
+			text-align:center;
+			display:block;
+		}
+
+	}
+
+	.rail { 
+		stroke: $light-grey; 
+	}
+
+	.progress { 
+		stroke: $grey; 
+	}
+
+	.icon { 
+		color: $grey; 
+	}
+
+	&.fail  {
+
+		.progress { 
+			stroke: $red; 
+		}
+
+		.icon { 
+			color: $red; 
+		}
+	}
+
+	&.pass  {
+
+		.progress { 
+			stroke: $green; 
+		}
+
+		.icon { 
+			color: $green; 
+		}
+	}
+
+}
+
+.theme-button {
+	border:0;
+	background-color: $black;
+	color: $white;
+	text-align: center;
+	text-decoration: none;
+	text-overflow: ellipsis;
+	text-transform: uppercase;
+	line-height: 40px;
+	display: inline-block;
+	width: auto;
+	height: auto;
+	margin:0;
+	padding:0 20px;
+	white-space: nowrap;
+	cursor: pointer;
+	outline: none;
+	overflow-x: hidden;
+
+	&:link,
+	&:visited {
+	   background: $black;
+	   color: $white;
+	}
+
+	&:active,
+	&:focus,
+	&:hover {
+	   background: $grey;
+	   color: $black;
+	}
+
+	&.full-width {
+		display:block;
+	}
+
+	&.white {
+		background-color:$white;
+		color:$black;
+	}
+}
+
+.theme-headline {
+	@extend %headline;
+	color:$black;
+
+	&.h1 {
+		@extend %h1;
+	}
+
+	&.h2 {
+		@extend %h2;
+	}
+
+	&.h3 {
+		@extend %h3;
+	}
+
+	&.h4 {
+		@extend %h4;
+	}
+
+	&.h5 {
+		@extend %h5;
+	}
+
+	&.h6 {
+		@extend %h6;
+	}
+}
+
+.theme-main {
+	padding-top:120px;
+}
+
+.theme-paragraph {
+	@extend %paragraph;
+}
+
+.theme-rte {
+
+	* {
+		color:$white;
+	}
+
+	p {
+		@extend %paragraph;
+	}
+
+	ul {
+		list-style:disc;
+
+		li {
+			font-size:16px;
+			font-weight:400;
+			line-height:24px;
+		}
+	}
+}
+
+.theme-section {
+	margin-top:40px;
+}
+
+.theme-table {
+	border:1px $black solid;
+	width:100%;
+
+	tbody {
+		width:100%;
+	}
+
+	tr {
+		border-top:1px $black solid;
+
+		&:first-child {
+			border-top:none;
+		}
+
+		td,
+		th {
+			border-left:1px $black solid;
+			padding:12px 8px;
+
+			&:first-child {
+				border-left:none;
+			}
+		}
+
+		th {
+			width:120px;
+		}
+	}
+}
+
+.theme-text {
+	@extend %paragraph;
+	@extend %align-center;
+}
+
+.theme-top-toolbar {
+	background-color:$black;
+	padding:12px 0px;
+	position:fixed;
+	top:0;
+	left:0;
+	right:0;
+}

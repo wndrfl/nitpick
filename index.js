@@ -83,10 +83,12 @@ export async function run(options) {
 	let passes = false;
 	for(var i in options.lhrCategories) {
 		
-		let results = lighthouse.parseResultsOfCategoryAnalysis(runnerResult, options.lhrCategories[i].key);
+		let results = lighthouse.parseResultsOfCategoryAnalysisIntoPassFail(runnerResult, options.lhrCategories[i].key);
 		if(!results) {
 			continue;
 		}
+
+		// console.log(results);
 		
 		if(lighthouse.analysisCategoryPasses(runnerResult, options.lhrCategories[i].key)) {
 			passes = true;
@@ -125,24 +127,76 @@ export async function run(options) {
 
 	const filename = 'report.html';
 
-	let path = require.resolve('./report.template.html');
+	let path = require.resolve('./src/report.template.html');
 	let data = fs.readFileSync(path, 'utf8');
 
 	let params = {};
 
 	// General Meta
-	params.canonical = metadataForUrl.canonical;
-	params.meta_description = metadataForUrl.meta_description;
-	params.fb_app_id = metadataForUrl.fb_app_id;
-	params.fb_pages = metadataForUrl.fb_pages;
-	params.og_image = metadataForUrl.og_image;
-	params.og_title = metadataForUrl.og_title;
-	params.og_type = metadataForUrl.og_type;
-	params.og_url = metadataForUrl.og_url;
-	params.page_title = metadataForUrl.title;
+	params.canonical = metadataForUrl.canonical || '-';
+	params.meta_description = metadataForUrl.meta_description || '-';
+	params.fb_app_id = metadataForUrl.fb_app_id || '-';
+	params.fb_pages = metadataForUrl.fb_pages || '-';
+	params.h1 = metadataForUrl.h1 || '-';
+	params.og_image = metadataForUrl.og_image || '-';
+	params.og_title = metadataForUrl.og_title || '-';
+	params.og_type = metadataForUrl.og_type || '-';
+	params.og_url = metadataForUrl.og_url || '-';
+	params.page_title = metadataForUrl.title || '-';
 	params.url = url;
 
-	// Improvement Opportunities
+	// Performance metrics
+	// https://yoast.com/google-lighthouse/
+	params.performance = {
+		gauge_class : 'na',
+		gauge_text : 'N/A',
+		metrics: {},
+		score: 0,
+	};
+	if(runnerResult.lhr.categories['performance']) {
+
+		const performanceCategory = runnerResult.lhr.categories['performance'];
+
+		// Score
+		params.performance.score = lighthouse.normalizeScore(performanceCategory.score);
+		params.performance.gauge_class = (lighthouse.scorePasses(params.performance.score) ? 'pass' : 'fail');
+		params.performance.gauge_text = (lighthouse.scorePasses(params.performance.score) ? 'Pass' : 'Fail');
+
+		const auditRefs = performanceCategory.auditRefs;
+		const auditRefIds = auditRefs.map((ref) => {
+			return ref.id;
+		});
+
+		// Get first contentful paint audit
+		const firstContentfulPaintAudit = runnerResult.lhr.audits['first-contentful-paint'];
+		params.performance.metrics.first_contentful_paint = {
+			description : firstContentfulPaintAudit.description,
+			display_value : firstContentfulPaintAudit.displayValue,
+			milliseconds : (firstContentfulPaintAudit.numericUnit == 'millisecond') ? firstContentfulPaintAudit.numericValue : firstContentfulPaintAudit.numericValue * 1000,
+			seconds : (firstContentfulPaintAudit.numericUnit == 'millisecond') ? firstContentfulPaintAudit.numericValue / 1000 : firstContentfulPaintAudit.numericValue,
+		};
+
+		// Get largest contentful paint audit
+		const largestContentfulPaintAudit = runnerResult.lhr.audits['largest-contentful-paint'];
+		params.performance.metrics.largest_contentful_paint = {
+			description : largestContentfulPaintAudit.description,
+			display_value : largestContentfulPaintAudit.displayValue,
+			milliseconds : (largestContentfulPaintAudit.numericUnit == 'millisecond') ? largestContentfulPaintAudit.numericValue : largestContentfulPaintAudit.numericValue * 1000,
+			seconds : (largestContentfulPaintAudit.numericUnit == 'millisecond') ? largestContentfulPaintAudit.numericValue / 1000 : largestContentfulPaintAudit.numericValue,
+		};
+
+		// Get total blocking time audit
+		const totalBlockingTimeAudit = runnerResult.lhr.audits['total-blocking-time'];
+		params.performance.metrics.total_blocking_time = {
+			description : totalBlockingTimeAudit.description,
+			display_value : totalBlockingTimeAudit.displayValue,
+			milliseconds : (totalBlockingTimeAudit.numericUnit == 'millisecond') ? totalBlockingTimeAudit.numericValue : totalBlockingTimeAudit.numericValue * 1000,
+			seconds : (totalBlockingTimeAudit.numericUnit == 'millisecond') ? totalBlockingTimeAudit.numericValue / 1000 : totalBlockingTimeAudit.numericValue,
+		};
+	}
+
+
+	// Improvement Opportunities across all audits
 	let improvementOpportunities = [];
 	for(var i in categoryResults) {
 		let failed = categoryResults[i].failed;

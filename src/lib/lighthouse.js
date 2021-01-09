@@ -18,7 +18,7 @@ export function analysisCategoryPasses(runnerResult, lhrCategory) {
   return scorePasses(score);
 }
 
-export function parseResultsOfCategoryAnalysis(runnerResult, lhrCategory) {
+export function parseResultsOfCategoryAnalysisIntoPassFail(runnerResult, lhrCategory) {
 
   if(!runnerResult.lhr.categories[lhrCategory]) {
     return;
