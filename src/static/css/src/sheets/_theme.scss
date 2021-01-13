@@ -169,6 +169,67 @@ strong {
 	padding-top:120px;
 }
 
+.theme-nav-gauge {
+	width:100%;
+	position: relative;
+
+	.gauge-container-gauge {
+		position: relative;
+		display: block;
+    
+	    circle { 
+	    	stroke-width: 15; 
+	    }
+
+		.gauge-container-rail { 
+			stroke: $light-grey;
+			fill: transparent; 
+		}
+
+		.gauge-container-progress {
+			fill: transparent;
+			stroke: $grey; 
+			stroke-linecap: round;
+
+		}
+
+	}
+
+	.gauge-container-label {
+		font-size:20px;
+		font-weight:800;
+		display: inline-block;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%);
+
+	}
+
+	&.fail  {
+
+		.gauge-container-progress { 
+			stroke: $red; 
+		}
+
+		.gauge-container-label { 
+			color: $red; 
+		}
+	}
+
+	&.pass  {
+
+		.gauge-container-progress { 
+			stroke: $green; 
+		}
+
+		.gauge-container-label { 
+			color: $green; 
+		}
+	}
+
+}
+
 .theme-paragraph {
 	@extend %paragraph;
 }
@@ -247,45 +308,6 @@ strong {
 			}
 		}
 	}
-
-	.theme-performance-opportunity-table {
-		border:1px $border-grey solid;
-		width:100%;
-		margin:20px 0 32px 0;
-		border-radius:12px;
-		border-collapse: separate !important;
-
-		tr {
-
-			&:first-child {
-				td,
-				th {
-					border:none;
-				}
-			}
-
-			td,
-			th {
-				border-top:1px $border-grey solid;
-				padding:12px 20px;
-			}
-
-			td {
-				font-size:14px;
-				font-weight:400;
-
-				img {
-					width:100%;
-					max-width:200px;
-				}
-			}
-
-			th {
-				font-size:14px;
-				font-weight:700;
-			}
-		}
-	}
 }
 
 .theme-performance-summary {
@@ -333,6 +355,10 @@ strong {
 	box-shadow:0 0 32px rgba(0,0,0,0.1);
 	margin-top:40px;
 
+	&:first-child {
+		margin-top:0;
+	}
+
 	.theme-section-inset {
 		padding:0 48px;
 	}
@@ -340,6 +366,31 @@ strong {
 
 .theme-section-headline {
 	margin-bottom:40px;
+}
+
+.theme-side-nav {
+	padding-top:40px;
+
+	.theme-side-nav-gauge {
+		padding:0 8px;
+	}
+
+	.theme-side-nav-label {
+		font-size:12px;
+		text-align:center;
+		margin-top:4px;
+	}
+
+	ul {
+		list-style:none;
+		margin:0;
+		padding:0;
+
+		li {
+			margin:0;
+			padding:0;
+		}
+	}
 }
 
 .theme-stat-bullet {
@@ -415,32 +466,40 @@ strong {
 }
 
 .theme-table {
-	border:1px $black solid;
+	border:1px $border-grey solid;
 	width:100%;
-
-	tbody {
-		width:100%;
-	}
+	margin:20px 0 32px 0;
+	border-radius:12px;
+	border-collapse: separate !important;
 
 	tr {
-		border-top:1px $black solid;
 
 		&:first-child {
-			border-top:none;
+			td,
+			th {
+				border:none;
+			}
 		}
 
 		td,
 		th {
-			border-left:1px $black solid;
-			padding:12px 8px;
+			border-top:1px $border-grey solid;
+			padding:12px 20px;
+		}
 
-			&:first-child {
-				border-left:none;
+		td {
+			font-size:14px;
+			font-weight:400;
+
+			img {
+				width:100%;
+				max-width:200px;
 			}
 		}
 
 		th {
-			width:120px;
+			font-size:14px;
+			font-weight:700;
 		}
 	}
 }
