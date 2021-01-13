@@ -45,6 +45,8 @@ export function parseResultsOfCategoryAnalysisIntoPassFail(runnerResult, lhrCate
 
     const audit = runnerResult.lhr.audits[key];
 
+    console.log(audit);
+
     // Weed out various audits that don't impact the report
     if(audit.score == null && audit.scoreDisplayMode != 'notApplicable') {
       continue;
@@ -53,6 +55,7 @@ export function parseResultsOfCategoryAnalysisIntoPassFail(runnerResult, lhrCate
     const score = normalizeScore(audit.score);      
 
     var auditRepresentation = {
+      id: audit.id,
       title: audit.title, 
       description: audit.description,
       score: score,

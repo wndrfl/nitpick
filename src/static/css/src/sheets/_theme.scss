@@ -15,7 +15,7 @@ a {
 }
 
 body {
-	background-color:$white;
+	background-color:$ambient;
 
 	&.no-scroll {
 		overflow: hidden;
@@ -27,54 +27,39 @@ strong {
 }
 
 .gauge-container {
+	max-width:300px;
 	position: relative;
 
-	.gauge {
-
+	.gauge-container-gauge {
 		position: relative;
 		display: block;
     
-	    circle{ 
+	    circle { 
 	    	stroke-width: 15; 
 	    }
 
-		.rail { 
+		.gauge-container-rail { 
+			stroke: $light-grey;
 			fill: transparent; 
 		}
 
-		.progress{
-
+		.gauge-container-progress {
 			fill: transparent;
+			stroke: $grey; 
 			stroke-linecap: round;
 
 		}
 
 	}
 
-	.center {
-
+	.gauge-container-label {
+		font-size:80px;
+		font-weight:800;
 		display: inline-block;
 		position: absolute;
 		top: 50%;
 		left: 50%;
 		transform: translate(-50%, -50%);
-		font-weight: 300;
-
-	    &.percentage { 
-	    	font-size: 2vw; 
-	    }
-
-	    &.icon { 
-	    	font-size: 3vw; 
-	    }
-
-		.percentSymbol { 
-			font-size: .8em; 
-		}
-			
-		.value { 
-			font-size: 1.8em; 
-		}
 
 		.small {
 			font-size:14px;
@@ -84,36 +69,24 @@ strong {
 
 	}
 
-	.rail { 
-		stroke: $light-grey; 
-	}
-
-	.progress { 
-		stroke: $grey; 
-	}
-
-	.icon { 
-		color: $grey; 
-	}
-
 	&.fail  {
 
-		.progress { 
+		.gauge-container-progress { 
 			stroke: $red; 
 		}
 
-		.icon { 
+		.gauge-container-label { 
 			color: $red; 
 		}
 	}
 
 	&.pass  {
 
-		.progress { 
+		.gauge-container-progress { 
 			stroke: $green; 
 		}
 
-		.icon { 
+		.gauge-container-label { 
 			color: $green; 
 		}
 	}
@@ -138,6 +111,7 @@ strong {
 	cursor: pointer;
 	outline: none;
 	overflow-x: hidden;
+	border-radius:12px;
 
 	&:link,
 	&:visited {
@@ -199,10 +173,142 @@ strong {
 	@extend %paragraph;
 }
 
+.theme-performance-opportunities {
+	border-top:1px $border-grey solid;
+	padding:40px;
+	margin-top:32px;
+
+	.theme-performance-opportunities-headline {
+		margin-bottom:20px;
+	}
+
+	ul {
+		list-style:none;
+		margin:0;
+		padding:0;
+
+		li {
+			margin:0;
+			padding:12px 0;
+		}
+	}
+}
+
+.theme-performance-opportunities-list {
+	border-right:1px $border-grey solid;
+
+	ul {
+		list-style:none;
+		margin:0;
+		padding:0;
+
+		li {
+			border-top:1px $border-grey solid;
+			margin:0;
+			padding:0;
+		}
+	}
+
+	.theme-performance-opportunities-list-item {
+		padding:20px 12px;
+		cursor:pointer;
+		@include transition(all,0.2s,ease-in-out);
+
+		&.active {
+			background-color:$ambient;
+		}
+	}
+}
+
+.theme-performance-opportunity {
+	display:none;
+
+	&.active {
+		display:block;
+	}
+
+	.theme-performance-opportunity-description {
+		font-size:12px;
+	}
+
+	.theme-performance-opportunity-headline {}
+
+	.theme-performance-opportunity-overalls {
+		display:flex;
+		justify-content:flex-start;
+		align-items:center;
+		margin-top:32px;
+
+		.theme-performance-opportunity-overall {
+			margin-left:32px;
+
+			&:first-child {
+				margin-left:0;
+			}
+		}
+	}
+
+	.theme-performance-opportunity-table {
+		border:1px $border-grey solid;
+		width:100%;
+		margin:20px 0 32px 0;
+		border-radius:12px;
+		border-collapse: separate !important;
+
+		tr {
+
+			&:first-child {
+				td,
+				th {
+					border:none;
+				}
+			}
+
+			td,
+			th {
+				border-top:1px $border-grey solid;
+				padding:12px 20px;
+			}
+
+			td {
+				font-size:14px;
+				font-weight:400;
+
+				img {
+					width:100%;
+					max-width:200px;
+				}
+			}
+
+			th {
+				font-size:14px;
+				font-weight:700;
+			}
+		}
+	}
+}
+
+.theme-performance-summary {
+
+	.theme-performance-summary-gauge {
+		width:100%;
+	}
+}
+
+.theme-performance-summary-bullets {
+	.theme-performance-summary-bullets-bullet {
+		margin-bottom:20px;
+
+		&:first-child {
+			margin-top:0;
+		}
+	}
+}
+
 .theme-rte {
 
 	* {
-		color:$white;
+		color:$black;
 	}
 
 	p {
@@ -221,7 +327,91 @@ strong {
 }
 
 .theme-section {
+	background-color:$white;
+	padding:48px 0;
+	border-radius:12px;
+	box-shadow:0 0 32px rgba(0,0,0,0.1);
 	margin-top:40px;
+
+	.theme-section-inset {
+		padding:0 48px;
+	}
+}
+
+.theme-section-headline {
+	margin-bottom:40px;
+}
+
+.theme-stat-bullet {
+	display:flex;
+	align-items:center;
+	justify-content:flex-start;
+
+	.theme-stat-bullet-description {
+		font-size:14px;
+		text-align:left;
+	}
+
+	.theme-stat-bullet-headline {
+		font-size:24px;
+		font-weight:800;
+		font-style:italic;
+		text-align:left;
+		margin:0 0 4px 0;
+	}
+
+	.theme-stat-bullet-stat {
+		color:$light-grey;
+		font-size:40px;
+		font-weight:800;
+		text-align:left;
+		width:100px;
+		margin-right:12px;
+
+		&.fail {
+			color:$red;
+		}
+
+		&.pass {
+			color:$green;
+		}
+	}
+}
+
+.theme-stat-node {
+	border:1px $border-grey solid;
+	background-color:$white;
+	padding:12px 20px;
+	border-radius:12px;
+
+	&.fail {
+		border-color:$red;
+
+		.theme-stat-node-stat {
+			color:$red;
+		}
+	}
+
+	&.pass {
+		border-color:$green;
+		
+		.theme-stat-node-stat {
+			color:$green;
+		}
+	}
+
+	.theme-stat-node-description {
+		font-size:16px;
+		font-weight:400;
+		text-align:center;
+	}
+
+	.theme-stat-node-stat {
+		font-size:32px;
+		font-style:italic;
+		font-weight:800;
+		text-align:center;
+	}
 }
 
 .theme-table {

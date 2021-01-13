@@ -4,6 +4,8 @@ const metadata = require('./src/lib/metadata');
 const mustache = require('mustache');
 const open = require('open');
 const output = require('./src/lib/output');
+const prettyBytes = require('pretty-bytes');
+const prettyMilliseconds = require('pretty-ms');
 
 export const supportedCategories = {
 	accessibility : {
@@ -150,8 +152,9 @@ export async function run(options) {
 	params.performance = {
 		gauge_class : 'na',
 		gauge_text : 'N/A',
-		metrics: {},
-		score: 0,
+		improvement_opportunities : null,
+		metrics : {},
+		score : 0,
 	};
 	if(runnerResult.lhr.categories['performance']) {
 
@@ -170,8 +173,9 @@ export async function run(options) {
 		// Get first contentful paint audit
 		const firstContentfulPaintAudit = runnerResult.lhr.audits['first-contentful-paint'];
 		params.performance.metrics.first_contentful_paint = {
+			class : (firstContentfulPaintAudit.numericValue <= 2000) ? 'pass' : 'fail',
 			description : firstContentfulPaintAudit.description,
-			display_value : firstContentfulPaintAudit.displayValue,
+			display_value : (firstContentfulPaintAudit.numericUnit == 'millisecond') ? prettyMilliseconds(firstContentfulPaintAudit.numericValue) : firstContentfulPaintAudit.displayValue,
 			milliseconds : (firstContentfulPaintAudit.numericUnit == 'millisecond') ? firstContentfulPaintAudit.numericValue : firstContentfulPaintAudit.numericValue * 1000,
 			seconds : (firstContentfulPaintAudit.numericUnit == 'millisecond') ? firstContentfulPaintAudit.numericValue / 1000 : firstContentfulPaintAudit.numericValue,
 		};
@@ -179,8 +183,9 @@ export async function run(options) {
 		// Get largest contentful paint audit
 		const largestContentfulPaintAudit = runnerResult.lhr.audits['largest-contentful-paint'];
 		params.performance.metrics.largest_contentful_paint = {
+			class : (largestContentfulPaintAudit.numericValue <= 2500) ? 'pass' : 'fail',
 			description : largestContentfulPaintAudit.description,
-			display_value : largestContentfulPaintAudit.displayValue,
+			display_value : (largestContentfulPaintAudit.numericUnit == 'millisecond') ? prettyMilliseconds(largestContentfulPaintAudit.numericValue) : largestContentfulPaintAudit.displayValue,
 			milliseconds : (largestContentfulPaintAudit.numericUnit == 'millisecond') ? largestContentfulPaintAudit.numericValue : largestContentfulPaintAudit.numericValue * 1000,
 			seconds : (largestContentfulPaintAudit.numericUnit == 'millisecond') ? largestContentfulPaintAudit.numericValue / 1000 : largestContentfulPaintAudit.numericValue,
 		};
@@ -188,13 +193,75 @@ export async function run(options) {
 		// Get total blocking time audit
 		const totalBlockingTimeAudit = runnerResult.lhr.audits['total-blocking-time'];
 		params.performance.metrics.total_blocking_time = {
+			class : (totalBlockingTimeAudit.numericValue <= 300) ? 'pass' : 'fail',
 			description : totalBlockingTimeAudit.description,
-			display_value : totalBlockingTimeAudit.displayValue,
+			display_value : (totalBlockingTimeAudit.numericUnit == 'millisecond') ? prettyMilliseconds(totalBlockingTimeAudit.numericValue) : totalBlockingTimeAudit.displayValue,
 			milliseconds : (totalBlockingTimeAudit.numericUnit == 'millisecond') ? totalBlockingTimeAudit.numericValue : totalBlockingTimeAudit.numericValue * 1000,
 			seconds : (totalBlockingTimeAudit.numericUnit == 'millisecond') ? totalBlockingTimeAudit.numericValue / 1000 : totalBlockingTimeAudit.numericValue,
 		};
-	}
 
+		// Improvement opportunities for performance
+		let failed = categoryResults['Performance'].failed;
+		for(var f in failed) {
+			var item = failed[f];
+
+			if(item.details && item.details.type == 'opportunity') {
+
+				let opportunity = {
+					id : item.id,
+					title : item.title,
+					description : item.description,
+					details : null,
+				};
+
+				let details = {
+					headers: [],
+					rows: [],
+					overallSavingsMs: item.details.overallSavingsMs ? prettyMilliseconds(item.details.overallSavingsMs) : 'n/a',
+					overallSavingsBytes: item.details.overallSavingsBytes ? prettyBytes(item.details.overallSavingsBytes) : 'n/a',
+				};
+
+				details.headers = item.details.headings.map((heading) => {
+					return heading.label;
+				});
+
+				details.rows = item.details.items.map((rowParams) => {
+
+					let row = [];
+
+					item.details.headings.forEach((v,i) => {
+						switch(v.valueType) {
+							case 'bytes':
+								row.push(prettyBytes(rowParams[v.key]));
+								break;
+							case 'thumbnail':
+								row.push('<img src="' + rowParams[v.key] + '" />');
+								break;
+							case 'timespanMs':
+								row.push(prettyMilliseconds(rowParams[v.key]));
+								break;
+							case 'url':
+								row.push('<a href="' + rowParams[v.key] + '" target="_blank">' + rowParams[v.key] + '</a>');
+								break;
+							default:
+								row.push(rowParams[v.key]);
+								break;
+						}
+					});
+
+					return row;
+				});
+
+				opportunity.details = details;
+
+				if(!params.performance.improvement_opportunities) {
+					params.performance.improvement_opportunities = [];
+				}
+				
+				params.performance.improvement_opportunities.push(opportunity);
+			}
+		}		
+	}
 
 	// Improvement Opportunities across all audits
 	let improvementOpportunities = [];
