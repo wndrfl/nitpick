@@ -45,7 +45,7 @@ export function parseResultsOfCategoryAnalysisIntoPassFail(runnerResult, lhrCate
 
     const audit = runnerResult.lhr.audits[key];
 
-    console.log(audit);
+    // console.log(audit);
 
     // Weed out various audits that don't impact the report
     if(audit.score == null && audit.scoreDisplayMode != 'notApplicable') {

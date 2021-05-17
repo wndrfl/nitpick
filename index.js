@@ -71,7 +71,11 @@ export async function run(options) {
 	options = mergeOptionsIntoDefaults(options);
 
 	if(options.lhrCategories.length < 1) {
-		options.lhrCategories = Object.values(supportedCategories);
+		options.lhrCategories = [
+			supportedCategories.seo,
+			supportedCategories.performance
+		];
+		// options.lhrCategories = Object.values(supportedCategories);
 	}
 
 	output.info('Starting Lighthouse audits (' + (options.lhrCategories.map((item) => { return item.title }).join(', ')) + ')...');
@@ -158,6 +162,21 @@ export async function run(options) {
 	};
 	if(runnerResult.lhr.categories['performance']) {
 
+		const performanceMetricsToTrack = {
+			first_contentful_paint : {
+				goal: 2000,
+				slug: 'first-contentful-paint'
+			},
+			largest_contentful_paint : {
+				goal: 2500,
+				slug: 'largest-contentful-paint'
+			},
+			total_blocking_time : {
+				goal: 300,
+				slug: 'total-blocking-time'
+			},
+		};
+
 		const performanceCategory = runnerResult.lhr.categories['performance'];
 
 		// Score
@@ -170,35 +189,20 @@ export async function run(options) {
 			return ref.id;
 		});
 
-		// Get first contentful paint audit
-		const firstContentfulPaintAudit = runnerResult.lhr.audits['first-contentful-paint'];
-		params.performance.metrics.first_contentful_paint = {
-			class : (firstContentfulPaintAudit.numericValue <= 2000) ? 'pass' : 'fail',
-			description : firstContentfulPaintAudit.description,
-			display_value : (firstContentfulPaintAudit.numericUnit == 'millisecond') ? prettyMilliseconds(firstContentfulPaintAudit.numericValue) : firstContentfulPaintAudit.displayValue,
-			milliseconds : (firstContentfulPaintAudit.numericUnit == 'millisecond') ? firstContentfulPaintAudit.numericValue : firstContentfulPaintAudit.numericValue * 1000,
-			seconds : (firstContentfulPaintAudit.numericUnit == 'millisecond') ? firstContentfulPaintAudit.numericValue / 1000 : firstContentfulPaintAudit.numericValue,
-		};
+		// Gather metrics
+		for(var i in performanceMetricsToTrack) {
 
-		// Get largest contentful paint audit
-		const largestContentfulPaintAudit = runnerResult.lhr.audits['largest-contentful-paint'];
-		params.performance.metrics.largest_contentful_paint = {
-			class : (largestContentfulPaintAudit.numericValue <= 2500) ? 'pass' : 'fail',
-			description : largestContentfulPaintAudit.description,
-			display_value : (largestContentfulPaintAudit.numericUnit == 'millisecond') ? prettyMilliseconds(largestContentfulPaintAudit.numericValue) : largestContentfulPaintAudit.displayValue,
-			milliseconds : (largestContentfulPaintAudit.numericUnit == 'millisecond') ? largestContentfulPaintAudit.numericValue : largestContentfulPaintAudit.numericValue * 1000,
-			seconds : (largestContentfulPaintAudit.numericUnit == 'millisecond') ? largestContentfulPaintAudit.numericValue / 1000 : largestContentfulPaintAudit.numericValue,
-		};
+			let metric = performanceMetricsToTrack[i];
+			let audit = runnerResult.lhr.audits[metric.slug];
 
-		// Get total blocking time audit
-		const totalBlockingTimeAudit = runnerResult.lhr.audits['total-blocking-time'];
-		params.performance.metrics.total_blocking_time = {
-			class : (totalBlockingTimeAudit.numericValue <= 300) ? 'pass' : 'fail',
-			description : totalBlockingTimeAudit.description,
-			display_value : (totalBlockingTimeAudit.numericUnit == 'millisecond') ? prettyMilliseconds(totalBlockingTimeAudit.numericValue) : totalBlockingTimeAudit.displayValue,
-			milliseconds : (totalBlockingTimeAudit.numericUnit == 'millisecond') ? totalBlockingTimeAudit.numericValue : totalBlockingTimeAudit.numericValue * 1000,
-			seconds : (totalBlockingTimeAudit.numericUnit == 'millisecond') ? totalBlockingTimeAudit.numericValue / 1000 : totalBlockingTimeAudit.numericValue,
-		};
+			params.performance.metrics[i] = {
+				class : (audit.numericValue <= metric.goal) ? 'pass' : 'fail',
+				description : audit.description,
+				display_value : (audit.numericUnit == 'millisecond') ? prettyMilliseconds(audit.numericValue) : audit.displayValue,
+				milliseconds : (audit.numericUnit == 'millisecond') ? audit.numericValue : audit.numericValue * 1000,
+				seconds : (audit.numericUnit == 'millisecond') ? audit.numericValue / 1000 : audit.numericValue,
+			};	
+		}
 
 		// Improvement opportunities for performance
 		let failed = categoryResults['Performance'].failed;
@@ -260,6 +264,107 @@ export async function run(options) {
 				
 				params.performance.improvement_opportunities.push(opportunity);
 			}
+		}		
+	}
+
+	// SEO metrics
+	params.seo = {
+		gauge_class : 'na',
+		gauge_text : 'N/A',
+		improvement_opportunities : null,
+		metrics : {},
+		score : 0,
+	};
+	if(runnerResult.lhr.categories['seo']) {
+
+		const seoMetricsToTrack = {
+			document_title : {
+				slug: 'document-title'
+			},
+			meta_description : {
+				slug: 'meta-description'
+			},
+
+		};
+
+		const seoCategory = runnerResult.lhr.categories['seo'];
+
+		// Score
+		params.seo.score = lighthouse.normalizeScore(seoCategory.score);
+		params.seo.gauge_class = (lighthouse.scorePasses(params.seo.score) ? 'pass' : 'fail');
+		params.seo.gauge_text = (lighthouse.scorePasses(params.seo.score) ? 'Pass' : 'Fail');
+
+		const auditRefs = seoCategory.auditRefs;
+		const auditRefIds = auditRefs.map((ref) => {
+			return ref.id;
+		});
+
+		// Gather metrics
+		for(var i in seoMetricsToTrack) {
+
+			let metric = seoMetricsToTrack[i];
+			let audit = runnerResult.lhr.audits[metric.slug];
+
+			params.performance.metrics[i] = {
+				class : (audit.numericValue <= metric.goal) ? 'pass' : 'fail',
+				description : audit.description,
+				display_value : (audit.numericUnit == 'millisecond') ? prettyMilliseconds(audit.numericValue) : audit.displayValue,
+				milliseconds : (audit.numericUnit == 'millisecond') ? audit.numericValue : audit.numericValue * 1000,
+				seconds : (audit.numericUnit == 'millisecond') ? audit.numericValue / 1000 : audit.numericValue,
+			};	
+		}
+
+		// Improvement opportunities for performance
+		let failed = categoryResults['SEO'].failed;
+		for(var f in failed) {
+
+			var item = failed[f];
+			// console.log(item.details);
+
+			let opportunity = {
+				id : item.id,
+				title : item.title,
+				description : item.description,
+				details : null,
+			};
+
+			let details = {
+				headers: [],
+				rows: [],
+				overallSavingsMs: item.details.overallSavingsMs ? prettyMilliseconds(item.details.overallSavingsMs) : 'n/a',
+				overallSavingsBytes: item.details.overallSavingsBytes ? prettyBytes(item.details.overallSavingsBytes) : 'n/a',
+			};
+
+			details.headers = item.details.headings.map((heading) => {
+				return heading.text;
+			});
+
+			details.rows = item.details.items.map((rowParams) => {
+
+				let row = [];
+
+				item.details.headings.forEach((v,i) => {
+
+					if(typeof rowParams[v.key] === 'object' && rowParams[v.key] !== null) {
+
+						console.log(rowParams[v.key]);
+						row.push('<pre>' + rowParams[v.key].snippet + '</pre>');
+
+					}else{
+						row.push(rowParams[v.key]);
+					}
+				});
+
+				return row;
+			});
+
+			opportunity.details = details;
+
+			if(!params.seo.improvement_opportunities) {
+				params.seo.improvement_opportunities = [];
+			}
+			
+			params.seo.improvement_opportunities.push(opportunity);
 		}		
 	}
 
