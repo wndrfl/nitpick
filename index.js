@@ -319,7 +319,7 @@ export async function run(options) {
 		for(var f in failed) {
 
 			var item = failed[f];
-			// console.log(item.details);
+			console.log(item);
 
 			let opportunity = {
 				id : item.id,
@@ -329,34 +329,32 @@ export async function run(options) {
 			};
 
 			let details = {
-				headers: [],
+				headers: item.details && item.details.headings ? item.details.headings.map((heading) => { return heading.text; }) : [],
 				rows: [],
-				overallSavingsMs: item.details.overallSavingsMs ? prettyMilliseconds(item.details.overallSavingsMs) : 'n/a',
-				overallSavingsBytes: item.details.overallSavingsBytes ? prettyBytes(item.details.overallSavingsBytes) : 'n/a',
+				overallSavingsMs: item.details && item.details.overallSavingsMs ? prettyMilliseconds(item.details.overallSavingsMs) : 'n/a',
+				overallSavingsBytes: item.details && item.details.overallSavingsBytes ? prettyBytes(item.details.overallSavingsBytes) : 'n/a',
 			};
 
-			details.headers = item.details.headings.map((heading) => {
-				return heading.text;
-			});
+			if(item.details && item.details.items) {
+				details.rows = item.details.items.map((rowParams) => {
 
-			details.rows = item.details.items.map((rowParams) => {
+					let row = [];
 
-				let row = [];
+					item.details.headings.forEach((v,i) => {
 
-				item.details.headings.forEach((v,i) => {
+						if(typeof rowParams[v.key] === 'object' && rowParams[v.key] !== null) {
 
-					if(typeof rowParams[v.key] === 'object' && rowParams[v.key] !== null) {
+							console.log(rowParams[v.key]);
+							row.push('<pre>' + rowParams[v.key].snippet + '</pre>');
 
-						console.log(rowParams[v.key]);
-						row.push('<pre>' + rowParams[v.key].snippet + '</pre>');
+						}else{
+							row.push(rowParams[v.key]);
+						}
+					});
 
-					}else{
-						row.push(rowParams[v.key]);
-					}
+					return row;
 				});
-
-				return row;
-			});
+			}
 
 			opportunity.details = details;
 

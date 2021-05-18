@@ -53,7 +53,7 @@ strong {
 	}
 
 	.gauge-container-label {
-		font-size:80px;
+		font-size:24px;
 		font-weight:800;
 		display: inline-block;
 		position: absolute;
@@ -62,7 +62,7 @@ strong {
 		transform: translate(-50%, -50%);
 
 		.small {
-			font-size:14px;
+			font-size:12px;
 			text-align:center;
 			display:block;
 		}
@@ -166,7 +166,7 @@ strong {
 }
 
 .theme-main {
-	padding-top:120px;
+	padding:120px 0;
 }
 
 .theme-nav-gauge {
@@ -327,6 +327,11 @@ strong {
 	}
 }
 
+.theme-print-action {
+	text-align: center;
+	margin-top:40px;
+}
+
 .theme-rte {
 
 	* {
@@ -360,12 +365,15 @@ strong {
 	}
 
 	.theme-section-inset {
-		padding:0 48px;
+		padding-left: 48px;
+		padding-right: 48px;
 	}
 }
 
 .theme-section-headline {
-	margin-bottom:40px;
+	border-bottom:1px $border-grey solid;
+	margin-bottom:20px;
+	padding-bottom:20px;
 }
 
 .theme-side-nav {

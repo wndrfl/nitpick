@@ -179,6 +179,17 @@ function importCssTask() {
 		.pipe(dest('../'));
 }
 
+
+// Sass task: compiles the scripts.js file into scripts.js
+function importJsTask() {
+    return src('../report.template.html')
+		.pipe(replace(/<script((.|\n|\r)*?)<\/script>/, function(s) {
+			var script = fs.readFileSync('js/scripts.js', 'utf8');
+			return '<script>\n' + script + '</script>';
+		}))
+		.pipe(dest('../'));
+}
+
 // Watch task: watch SCSS and JS files for changes
 // If any change, run scss and js tasks simultaneously
 function watchTask() {
@@ -190,7 +201,8 @@ function watchTask() {
         {interval: 1000, usePolling: true}, //Makes docker work
         series(
             parallel(imageMinTask, scssTask, jsTask),
-            importCssTask
+            importCssTask,
+            importJsTask
         )
     );    
 }
@@ -201,5 +213,6 @@ function watchTask() {
 exports.default = series(
     parallel(imageMinTask, scssTask, jsTask),
     importCssTask,
+    importJsTask,
     watchTask
 );
